@@ -1,0 +1,17 @@
+{
+  "name": "upscale/stdlib-object-lifecycle",
+  "description": "PHP library to detect memory leaks of objects allocated by long-running scripts",
+  "version": "1.0.0",
+  "keywords": ["PHP", "object", "memory", "leak", "allocation", "allocate", "destructor", "destruct", "Swoole"],
+  "homepage": "https://github.com/upscalesoftware/object-lifecycle-watcher",
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "Upscale Software Team",
+      "email": "info@upscalesoftware.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {"Upscale\\Stdlib\\Object\\Lifecycle\\": "src/"}
+  }
+}
