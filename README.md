@@ -4,7 +4,7 @@ Object Lifecycle Monitoring
 This library tracks existence of objects throughout their lifecycle until eventual destruction.
 It can accurately detect memory leaks in long-running CLI scripts or event-driven web-servers, such as [Swoole](https://www.swoole.co.uk/) or [ReactPHP](https://reactphp.org/).
 
-The lifecycle monitoring can be easily activated for an application that centralizes instantiation of all objects, such as via a DI container. 
+The monitoring can be easily activated for applications with centralized object instantiation, i.e. using a DI container. 
 
 **Features:**
 - Watch any object w/o modifying its source code
