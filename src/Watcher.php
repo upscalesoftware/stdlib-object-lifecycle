@@ -27,24 +27,25 @@ class Watcher
     {
         $this->probeName = $probeName;
         $this->probe = new \stdClass();
-        $this->probeZeroRefCount = $this->countProbeReferences();
+        $this->probeZeroRefCount = $this->countReferences($this->probe);
     }
 
     /**
-     * Count references to the probe instance
+     * Count references to a given variable
      *
+     * @param mixed $variable
      * @return int
      * @throws \UnexpectedValueException
      */
-    protected function countProbeReferences()
+    protected function countReferences(&$variable)
     {
         ob_start();
-        debug_zval_dump($this->probe);
+        debug_zval_dump($variable);
         $dump = ob_get_clean();
         if (preg_match('/refcount\((\d+)\)/', $dump, $matches)) {
             return (int)$matches[1];
         }
-        throw new \UnexpectedValueException('Unable to count references to the probe.');
+        throw new \UnexpectedValueException('Unable to count references.');
     }
 
     /**
@@ -79,7 +80,7 @@ class Watcher
         if ($accurate) {
             gc_collect_cycles();
         }
-        return ($this->countProbeReferences() - $this->probeZeroRefCount);
+        return ($this->countReferences($this->probe) - $this->probeZeroRefCount);
     }
 
     /**
