@@ -10,7 +10,8 @@ The monitoring can be easily activated for applications with centralized object 
 - Watch any object w/o modifying its source code
 - Count objects that are alive at any given time
 - Deallocate circular references awaiting garbage collection
-- Assert all watched objects have been destroyed 
+- Assert all watched objects have been destroyed
+- Debug objects that have not been destroyed 
 
 ## Installation
 
@@ -39,23 +40,41 @@ $watcher->watch($obj3);
 unset($obj1);
 
 // Outputs 3 because of circular references
-echo $watcher->countAliveObjects();
+echo count($watcher->detectAliveObjects());
 
 unset($obj2);
 
 // Outputs 3 because of pending garbage collection 
-echo $watcher->countAliveObjects(false);
+echo count($watcher->detectAliveObjects(false));
 
 // Outputs 1 after forced garbage collection 
-echo $watcher->countAliveObjects();
+echo count($watcher->detectAliveObjects());
 
 unset($obj3);
 
 // Outputs 0
 echo $watcher->countAliveObjects();
 
+// Assert all watched objects have been destroyed
 $watcher->assertObjectsDestroyed();
 ```
+
+Method `detectAliveObjects()` returns the following debug information:
+```php
+array(
+  array(
+    'type' => 'stdClass',
+    'hash' => '00000000524c32e1000000002cee0034',
+    'trace' => '#0 demo.php(26): Upscale\\Stdlib\\Object\\Lifecycle\\Watcher->watch(Object(stdClass))
+#1 demo.php(10): Example->runTest()
+#2 demo.php(53): Example->test()
+#3 {main}',
+  ),
+  ...
+)
+```
+
+Method `countAliveObjects()` is a shortcut for `count(detectAliveObjects())`.
 
 ## Contributing
 

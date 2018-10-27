@@ -1,6 +1,8 @@
 <?php
 namespace Upscale\Stdlib\Object\Lifecycle;
 
+use Exception as Stack;
+
 class Watcher
 {
     /**
@@ -9,14 +11,14 @@ class Watcher
     private $probeName;
 
     /**
-     * @var \stdClass
+     * @var Probe[] 
      */
-    private $probe;
+    private $probes = [];
 
     /**
      * @var int
      */
-    private $probeZeroRefCount;
+    private $probeZeroRefCount = 0;
 
     /**
      * Inject dependencies
@@ -26,8 +28,6 @@ class Watcher
     public function __construct($probeName = '---probe')
     {
         $this->probeName = $probeName;
-        $this->probe = new \stdClass();
-        $this->probeZeroRefCount = $this->countReferences($this->probe);
     }
 
     /**
@@ -55,7 +55,14 @@ class Watcher
      */
     public function watch($subject)
     {
-        $subject->{$this->probeName} = $this->probe;
+        if (!isset($subject->{$this->probeName})) {
+            $probe = new Probe($subject, new Stack());
+            $this->probes[$probe->getId()] = $probe;
+            if (!$this->probeZeroRefCount) {
+                $this->probeZeroRefCount = $this->countReferences($probe);
+            }
+            $subject->{$this->probeName} = $probe;
+        }
     }
 
     /**
@@ -65,7 +72,12 @@ class Watcher
      */
     public function unwatch($subject)
     {
-        unset($subject->{$this->probeName});
+        if (isset($subject->{$this->probeName})) {
+            /** @var Probe $probe */
+            $probe = $subject->{$this->probeName};
+            unset($this->probes[$probe->getId()]);
+            unset($subject->{$this->probeName});
+        }
     }
 
     /**
@@ -77,10 +89,33 @@ class Watcher
      */
     public function countAliveObjects($accurate = true)
     {
+        return count($this->detectAliveObjects($accurate));
+    }
+
+    /**
+     * Detect objects that have not been destroyed since attaching the probe to them
+     *
+     * @param bool $accurate Force garbage collection of cyclic references before counting
+     * @return array
+     * @throws \UnexpectedValueException
+     */
+    public function detectAliveObjects($accurate = true)
+    {
         if ($accurate) {
             gc_collect_cycles();
         }
-        return ($this->countReferences($this->probe) - $this->probeZeroRefCount);
+        $result = [];
+        foreach ($this->probes as $probe) {
+            $isAlive = ($this->countReferences($probe) > $this->probeZeroRefCount);
+            if ($isAlive) {
+                $result[] = [
+                    'type'  => $probe->getOwnerType(),
+                    'hash'  => $probe->getOwnerHash(),
+                    'trace' => $probe->getStackTrace(),
+                ];
+            }
+        }
+        return $result;
     }
 
     /**
