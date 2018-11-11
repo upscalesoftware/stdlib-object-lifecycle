@@ -49,34 +49,62 @@ class Watcher
     }
 
     /**
-     * Reference the probe from a given object incrementing the ref count of the probe
+     * Start watching one or more objects
      *
-     * @param object $subject
+     * @param object|object[] $objects
      */
-    public function watch($subject)
+    public function watch($objects)
     {
-        if (!isset($subject->{$this->probeName})) {
-            $probe = new Probe($subject, new Stack());
-            $this->probes[$probe->getId()] = $probe;
-            if (!$this->probeZeroRefCount) {
-                $this->probeZeroRefCount = $this->countReferences($probe);
-            }
-            $subject->{$this->probeName} = $probe;
+        $stack = new Stack();
+        $objects = is_array($objects) ? $objects : [$objects];
+        foreach ($objects as $object) {
+            $this->attachProbe($object, $stack);
         }
     }
 
     /**
-     * Remove reference to the probe from a given object if there's one, decrementing the ref count of the probe
+     * Stop watching one or more objects
      *
-     * @param object $subject
+     * @param object|object[] $objects
      */
-    public function unwatch($subject)
+    public function unwatch($objects)
     {
-        if (isset($subject->{$this->probeName})) {
+        $objects = is_array($objects) ? $objects : [$objects];
+        foreach ($objects as $object) {
+            $this->detachProbe($object);
+        }
+    }
+
+    /**
+     * Reference a probe from a given object incrementing the ref count of the probe
+     * 
+     * @param object $object
+     * @param Stack $stack
+     */
+    protected function attachProbe($object, Stack $stack)
+    {
+        if (!isset($object->{$this->probeName})) {
+            $probe = new Probe($object, $stack);
+            $this->probes[$probe->getId()] = $probe;
+            if (!$this->probeZeroRefCount) {
+                $this->probeZeroRefCount = $this->countReferences($probe);
+            }
+            $object->{$this->probeName} = $probe;
+        }
+    }
+
+    /**
+     * Remove reference to a probe from a given object decrementing the ref count of the probe
+     *
+     * @param object $object
+     */
+    public function detachProbe($object)
+    {
+        if (isset($object->{$this->probeName})) {
             /** @var Probe $probe */
-            $probe = $subject->{$this->probeName};
+            $probe = $object->{$this->probeName};
             unset($this->probes[$probe->getId()]);
-            unset($subject->{$this->probeName});
+            unset($object->{$this->probeName});
         }
     }
 
