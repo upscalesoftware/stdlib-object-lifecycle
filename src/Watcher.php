@@ -133,14 +133,37 @@ class Watcher
             gc_collect_cycles();
         }
         $result = [];
-        foreach ($this->probes as $probe) {
-            $isAlive = ($this->countReferences($probe) > $this->probeZeroRefCount);
-            if ($isAlive) {
-                $result[] = [
-                    'type'  => $probe->getOwnerType(),
-                    'hash'  => $probe->getOwnerHash(),
-                    'trace' => $probe->getStackTrace(),
-                ];
+        foreach ($this->filterAliveProbes($this->probes) as $probe) {
+            $result[] = [
+                'type'  => $probe->getOwnerType(),
+                'hash'  => $probe->getOwnerHash(),
+                'trace' => $probe->getStackTrace(),
+            ];
+        }
+        return $result;
+    }
+
+    /**
+     * Free resources allocated for tracking objects that are no longer alive
+     */
+    public function flush()
+    {
+        $this->probes = $this->filterAliveProbes($this->probes);
+    }
+
+    /**
+     * Filter out probes tracking objects that are no longer alive
+     * 
+     * @param Probe[] $probes
+     * @return Probe[]
+     */
+    protected function filterAliveProbes(array $probes)
+    {
+        $result = [];
+        foreach ($probes as $probeId => $probe) {
+            $refCount = $this->countReferences($probe) - $this->probeZeroRefCount;
+            if ($refCount > 0) {
+                $result[$probeId] = $probe;
             }
         }
         return $result;
