@@ -133,13 +133,16 @@ class Watcher
             gc_collect_cycles();
         }
         $result = [];
-        foreach ($this->filterAliveProbes($this->probes) as $probe) {
+        $probes = $this->filterAliveProbes($this->probes);
+        foreach ($probes as $probe) {
             $result[] = [
                 'type'  => $probe->getOwnerType(),
                 'hash'  => $probe->getOwnerHash(),
                 'trace' => $probe->getStackTrace(),
             ];
         }
+        // Destroy probes tracking objects that are no longer alive
+        $this->probes = $probes;
         return $result;
     }
 
@@ -148,7 +151,7 @@ class Watcher
      */
     public function flush()
     {
-        $this->probes = $this->filterAliveProbes($this->probes);
+        $this->detectAliveObjects(true);
     }
 
     /**
