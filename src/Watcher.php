@@ -21,6 +21,11 @@ class Watcher
     private $probeZeroRefCount = 0;
 
     /**
+     * @var int
+     */
+    private $watchCount = 0;
+
+    /**
      * Inject dependencies
      *
      * @param string $probeName
@@ -58,7 +63,9 @@ class Watcher
         $stack = new Stack();
         $objects = is_array($objects) ? $objects : [$objects];
         foreach ($objects as $object) {
-            $this->attachProbe($object, $stack);
+            if ($this->attachProbe($object, $stack)) {
+                $this->watchCount++;
+            }
         }
     }
 
@@ -71,7 +78,9 @@ class Watcher
     {
         $objects = is_array($objects) ? $objects : [$objects];
         foreach ($objects as $object) {
-            $this->detachProbe($object);
+            if ($this->detachProbe($object)) {
+                $this->watchCount--;
+            }
         }
     }
 
@@ -80,6 +89,7 @@ class Watcher
      * 
      * @param object $object
      * @param Stack $stack
+     * @return bool
      */
     protected function attachProbe($object, Stack $stack)
     {
@@ -90,13 +100,16 @@ class Watcher
                 $this->probeZeroRefCount = $this->countReferences($probe);
             }
             $object->{$this->probeName} = $probe;
+            return true;
         }
+        return false;
     }
 
     /**
      * Remove reference to a probe from a given object decrementing the ref count of the probe
      *
      * @param object $object
+     * @return bool
      */
     public function detachProbe($object)
     {
@@ -105,7 +118,19 @@ class Watcher
             $probe = $object->{$this->probeName};
             unset($this->probes[$probe->getId()]);
             unset($object->{$this->probeName});
+            return true;
         }
+        return false;
+    }
+
+    /**
+     * Return the number of objects being watched including the ones that are no longer alive
+     * 
+     * @return int
+     */
+    public function countWatchedObjects()
+    {
+        return $this->watchCount;
     }
 
     /**
