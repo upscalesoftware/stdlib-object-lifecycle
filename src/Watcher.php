@@ -63,9 +63,7 @@ class Watcher
         $stack = new Stack();
         $objects = is_array($objects) ? $objects : [$objects];
         foreach ($objects as $object) {
-            if ($this->attachProbe($object, $stack)) {
-                $this->watchCount++;
-            }
+            $this->watchCount += (int)$this->attachProbe($object, $stack);
         }
     }
 
@@ -78,9 +76,7 @@ class Watcher
     {
         $objects = is_array($objects) ? $objects : [$objects];
         foreach ($objects as $object) {
-            if ($this->detachProbe($object)) {
-                $this->watchCount--;
-            }
+            $this->watchCount -= (int)$this->detachProbe($object);
         }
     }
 
