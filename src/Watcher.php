@@ -120,7 +120,7 @@ class Watcher
     }
 
     /**
-     * Return the number of objects being watched including the ones that are no longer alive
+     * Return the total number of objects being watched, both gone and alive
      * 
      * @return int
      */
@@ -130,9 +130,9 @@ class Watcher
     }
 
     /**
-     * Count objects that have not been destroyed since attaching the probe to them
+     * Count objects survived since attaching the probe to them
      *
-     * @param bool $accurate Force garbage collection of cyclic references before counting
+     * @param bool $accurate Destroy objects awaiting garbage collection
      * @return int
      * @throws \UnexpectedValueException
      */
@@ -142,37 +142,56 @@ class Watcher
     }
 
     /**
-     * Detect objects that have not been destroyed since attaching the probe to them
+     * Detect objects survived since attaching the probe to them
      *
-     * @param bool $accurate Force garbage collection of cyclic references before counting
+     * @param bool $accurate Destroy objects awaiting garbage collection
      * @return array
      * @throws \UnexpectedValueException
      */
     public function detectAliveObjects($accurate = true)
     {
         if ($accurate) {
-            gc_collect_cycles();
+            $this->destroyGoneObjects();
         }
-        $result = [];
         $probes = $this->filterAliveProbes($this->probes);
-        foreach ($probes as $probe) {
-            $result[] = [
-                'type'  => $probe->getOwnerType(),
-                'hash'  => $probe->getOwnerHash(),
-                'trace' => $probe->getStackTrace(),
-            ];
-        }
         // Destroy probes tracking objects that are no longer alive
         $this->probes = $probes;
-        return $result;
+        return $this->renderReport($probes);
     }
 
     /**
-     * Free resources allocated for tracking objects that are no longer alive
+     * Detect objects destroyed since attaching the probe to them
+     *
+     * @param bool $accurate Destroy objects awaiting garbage collection
+     * @return array
+     * @throws \UnexpectedValueException
+     */
+    public function detectGoneObjects($accurate = true)
+    {
+        if ($accurate) {
+            $this->destroyGoneObjects();
+        }
+        $probes = $this->filterAliveProbes($this->probes);
+        $probes = array_diff_key($this->probes, $probes);
+        return $this->renderReport($probes);
+    }
+
+    /**
+     * Free resources allocated for tracking objects that are no longer alive.
+     * Information on destroyed objects will be no longer be available. 
      */
     public function flush()
     {
-        $this->detectAliveObjects(true);
+        $this->destroyGoneObjects();
+        $this->probes = $this->filterAliveProbes($this->probes);
+    }
+
+    /**
+     * Force garbage collection of cyclic references
+     */
+    protected function destroyGoneObjects()
+    {
+        gc_collect_cycles();
     }
 
     /**
@@ -189,6 +208,25 @@ class Watcher
             if ($refCount > 0) {
                 $result[$probeId] = $probe;
             }
+        }
+        return $result;
+    }
+
+    /**
+     * Render report on given probes
+     *
+     * @param Probe[] $probes
+     * @return array
+     */
+    protected function renderReport(array $probes)
+    {
+        $result = [];
+        foreach ($probes as $probe) {
+            $result[] = [
+                'type'  => $probe->getOwnerType(),
+                'hash'  => $probe->getOwnerHash(),
+                'trace' => $probe->getStackTrace(),
+            ];
         }
         return $result;
     }
