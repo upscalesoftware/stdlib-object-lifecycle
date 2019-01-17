@@ -138,7 +138,7 @@ class Watcher
         if ($accurate) {
             $this->destroyGoneObjects();
         }
-        $probes = $this->filterAliveProbes($this->probes);
+        $probes = $this->filterProbes($this->probes, true);
         return $this->renderReport($probes);
     }
 
@@ -154,8 +154,7 @@ class Watcher
         if ($accurate) {
             $this->destroyGoneObjects();
         }
-        $probes = $this->filterAliveProbes($this->probes);
-        $probes = array_diff_key($this->probes, $probes);
+        $probes = $this->filterProbes($this->probes, false);
         return $this->renderReport($probes);
     }
 
@@ -166,7 +165,7 @@ class Watcher
     public function flush()
     {
         $this->destroyGoneObjects();
-        $this->probes = $this->filterAliveProbes($this->probes);
+        $this->probes = $this->filterProbes($this->probes, true);
     }
 
     /**
@@ -178,17 +177,18 @@ class Watcher
     }
 
     /**
-     * Filter out probes tracking objects that are no longer alive
+     * Filter probes by health of objects they are tracking 
      * 
      * @param Probe[] $probes
+     * @param bool $alive
      * @return Probe[]
      */
-    protected function filterAliveProbes(array $probes)
+    protected function filterProbes(array $probes, $alive)
     {
         $result = [];
         foreach ($probes as $probeId => $probe) {
-            $refCount = $this->countReferences($probe) - $this->probeZeroRefCount;
-            if ($refCount > 0) {
+            $health = ($this->countReferences($probe) > $this->probeZeroRefCount);
+            if ($health === $alive) {
                 $result[$probeId] = $probe;
             }
         }
