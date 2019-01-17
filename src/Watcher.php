@@ -21,11 +21,6 @@ class Watcher
     private $probeZeroRefCount = 0;
 
     /**
-     * @var int
-     */
-    private $watchCount = 0;
-
-    /**
      * Inject dependencies
      *
      * @param string $probeName
@@ -63,7 +58,7 @@ class Watcher
         $stack = new Stack();
         $objects = is_array($objects) ? $objects : [$objects];
         foreach ($objects as $object) {
-            $this->watchCount += (int)$this->attachProbe($object, $stack);
+            $this->attachProbe($object, $stack);
         }
     }
 
@@ -76,7 +71,7 @@ class Watcher
     {
         $objects = is_array($objects) ? $objects : [$objects];
         foreach ($objects as $object) {
-            $this->watchCount -= (int)$this->detachProbe($object);
+            $this->detachProbe($object);
         }
     }
 
@@ -117,16 +112,6 @@ class Watcher
             return true;
         }
         return false;
-    }
-
-    /**
-     * Return the total number of objects being watched, both gone and alive
-     * 
-     * @return int
-     */
-    public function countWatchedObjects()
-    {
-        return $this->watchCount;
     }
 
     /**
