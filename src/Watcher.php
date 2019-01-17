@@ -139,8 +139,6 @@ class Watcher
             $this->destroyGoneObjects();
         }
         $probes = $this->filterAliveProbes($this->probes);
-        // Destroy probes tracking objects that are no longer alive
-        $this->probes = $probes;
         return $this->renderReport($probes);
     }
 
