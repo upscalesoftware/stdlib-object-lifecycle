@@ -213,19 +213,4 @@ class Watcher
         }
         return $result;
     }
-
-    /**
-     * Assert that all watched objects have been since destroyed
-     *
-     * @throws \UnexpectedValueException
-     */
-    public function assertObjectsDestroyed()
-    {
-        $aliveCount = $this->countAliveObjects();
-        if ($aliveCount > 0) {
-            throw new \UnexpectedValueException(
-                "A total of $aliveCount watched objects have not been destroyed."
-            );
-        }
-    }
 }

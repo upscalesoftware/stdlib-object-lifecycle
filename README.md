@@ -54,9 +54,6 @@ unset($obj3);
 
 // Outputs 0
 echo $watcher->countAliveObjects();
-
-// Assert all watched objects have been destroyed
-$watcher->assertObjectsDestroyed();
 ```
 
 Method `detectAliveObjects()` returns the following debug information:
