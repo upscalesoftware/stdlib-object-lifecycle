@@ -53,7 +53,7 @@ echo count($watcher->detectAliveObjects());
 unset($obj3);
 
 // Outputs 0
-echo $watcher->countAliveObjects();
+echo count($watcher->detectAliveObjects());
 ```
 
 Method `detectAliveObjects()` returns the following debug information:
@@ -70,8 +70,6 @@ array(
   ...
 )
 ```
-
-Method `countAliveObjects()` is a shortcut for `count(detectAliveObjects())`.
 
 ## Contributing
 

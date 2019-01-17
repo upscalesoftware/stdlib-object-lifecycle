@@ -115,18 +115,6 @@ class Watcher
     }
 
     /**
-     * Count objects survived since attaching the probe to them
-     *
-     * @param bool $accurate Destroy objects awaiting garbage collection
-     * @return int
-     * @throws \UnexpectedValueException
-     */
-    public function countAliveObjects($accurate = true)
-    {
-        return count($this->detectAliveObjects($accurate));
-    }
-
-    /**
      * Detect objects survived since attaching the probe to them
      *
      * @param bool $accurate Destroy objects awaiting garbage collection
