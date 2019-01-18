@@ -15,9 +15,9 @@ The monitoring can be easily activated for applications with centralized object 
 
 ## Installation
 
-The library is to be installed via [Composer](https://getcomposer.org/) as a dev dependency:
+The library is to be installed via [Composer](https://getcomposer.org/) as a dependency:
 ```bash
-composer require upscale/stdlib-object-lifecycle --dev
+composer require upscale/stdlib-object-lifecycle
 ```
 
 ## Usage
