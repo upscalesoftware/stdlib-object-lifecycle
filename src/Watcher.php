@@ -157,7 +157,7 @@ class Watcher
     }
 
     /**
-     * Destroy objects awaiting garbage collection of cyclic references
+     * Destroy objects awaiting garbage collection of circular references
      */
     protected function collectGarbage()
     {
