@@ -49,7 +49,7 @@ class Watcher
     }
 
     /**
-     * Start watching one or more objects
+     * Start watching health of one or more objects
      *
      * @param object|object[] $objects
      */
@@ -63,7 +63,7 @@ class Watcher
     }
 
     /**
-     * Stop watching one or more objects
+     * Stop watching health of one or more objects
      *
      * @param object|object[] $objects
      */
@@ -115,7 +115,7 @@ class Watcher
     }
 
     /**
-     * Detect objects survived since attaching the probe to them
+     * Detect objects survived since starting their health watch
      *
      * @param bool $accurate
      * @return array
@@ -131,7 +131,7 @@ class Watcher
     }
 
     /**
-     * Detect objects destroyed since attaching the probe to them
+     * Detect objects destroyed since starting their health watch
      *
      * @param bool $accurate
      * @return array
