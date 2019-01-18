@@ -51,11 +51,12 @@ echo count($watcher->detectAliveObjects());
 
 unset($obj3);
 
-// Outputs 0
+// Outputs 0 and 3 respectively
 echo count($watcher->detectAliveObjects());
+echo count($watcher->detectGoneObjects());
 ```
 
-Method `detectAliveObjects()` returns the following debug information:
+Methods `detectAliveObjects()` and `detectGoneObjects()` return the following debug information:
 ```php
 array(
   array(
