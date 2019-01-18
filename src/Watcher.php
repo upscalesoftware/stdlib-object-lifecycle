@@ -80,7 +80,6 @@ class Watcher
      * 
      * @param object $object
      * @param Stack $stack
-     * @return bool
      */
     protected function attachProbe($object, Stack $stack)
     {
@@ -91,16 +90,13 @@ class Watcher
                 $this->probeZeroRefCount = $this->countReferences($probe);
             }
             $object->{$this->probeName} = $probe;
-            return true;
         }
-        return false;
     }
 
     /**
      * Remove reference to a probe from a given object decrementing the ref count of the probe
      *
      * @param object $object
-     * @return bool
      */
     public function detachProbe($object)
     {
@@ -109,9 +105,7 @@ class Watcher
             $probe = $object->{$this->probeName};
             unset($this->probes[$probe->getId()]);
             unset($object->{$this->probeName});
-            return true;
         }
-        return false;
     }
 
     /**
