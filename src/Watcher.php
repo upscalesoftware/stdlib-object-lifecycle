@@ -117,14 +117,14 @@ class Watcher
     /**
      * Detect objects survived since attaching the probe to them
      *
-     * @param bool $accurate Destroy objects awaiting garbage collection
+     * @param bool $accurate
      * @return array
      * @throws \UnexpectedValueException
      */
     public function detectAliveObjects($accurate = true)
     {
         if ($accurate) {
-            $this->destroyGoneObjects();
+            $this->collectGarbage();
         }
         $probes = $this->filterProbes($this->probes, true);
         return $this->renderReport($probes);
@@ -133,14 +133,14 @@ class Watcher
     /**
      * Detect objects destroyed since attaching the probe to them
      *
-     * @param bool $accurate Destroy objects awaiting garbage collection
+     * @param bool $accurate
      * @return array
      * @throws \UnexpectedValueException
      */
     public function detectGoneObjects($accurate = true)
     {
         if ($accurate) {
-            $this->destroyGoneObjects();
+            $this->collectGarbage();
         }
         $probes = $this->filterProbes($this->probes, false);
         return $this->renderReport($probes);
@@ -152,14 +152,14 @@ class Watcher
      */
     public function flush()
     {
-        $this->destroyGoneObjects();
+        $this->collectGarbage();
         $this->probes = $this->filterProbes($this->probes, true);
     }
 
     /**
-     * Force garbage collection of cyclic references
+     * Destroy objects awaiting garbage collection of cyclic references
      */
-    protected function destroyGoneObjects()
+    protected function collectGarbage()
     {
         gc_collect_cycles();
     }
