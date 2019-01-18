@@ -8,10 +8,10 @@ The monitoring can be easily activated for applications with centralized object 
 
 **Features:**
 - Watch any object w/o modifying its source code
-- Count objects that are alive at any given time
-- Deallocate circular references awaiting garbage collection
-- Assert all watched objects have been destroyed
-- Debug objects that have not been destroyed 
+- Detect objects that are still alive
+- Detect objects that have been destroyed
+- Debug info on alive/destroyed objects: class, hash, trace
+- Garbage collection of circular references 
 
 ## Installation
 
@@ -34,8 +34,7 @@ $obj2->ref = $obj1;
 
 $watcher = new \Upscale\Stdlib\Object\Lifecycle\Watcher();
 $watcher->watch($obj1);
-$watcher->watch($obj2);
-$watcher->watch($obj3);
+$watcher->watch([$obj2, $obj3]);
 
 unset($obj1);
 
