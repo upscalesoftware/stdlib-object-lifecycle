@@ -1,7 +1,7 @@
 {
   "name": "upscale/stdlib-object-lifecycle",
   "description": "Library to monitor lifecycle of objects allocated by long-running PHP scripts",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "keywords": [
     "object", "health", "lifecycle", "life cycle",
     "RAM", "memory", "allocation", "allocate", "leak", "debug",
