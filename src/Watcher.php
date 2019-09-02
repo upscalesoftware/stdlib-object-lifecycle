@@ -83,7 +83,7 @@ class Watcher
      */
     protected function attachProbe($object, Stack $stack)
     {
-        if (!isset($object->{$this->probeName})) {
+        if (!property_exists($object, $this->probeName)) {
             $probe = new Probe($object, $stack);
             $this->probes[$probe->getId()] = $probe;
             if (!$this->probeZeroRefCount) {
@@ -100,11 +100,12 @@ class Watcher
      */
     public function detachProbe($object)
     {
-        if (isset($object->{$this->probeName})) {
-            /** @var Probe $probe */
+        if (property_exists($object, $this->probeName)) {
             $probe = $object->{$this->probeName};
-            unset($this->probes[$probe->getId()]);
-            unset($object->{$this->probeName});
+            if ($probe instanceof Probe) {
+                unset($this->probes[$probe->getId()]);
+                unset($object->{$this->probeName});
+            }
         }
     }
 
